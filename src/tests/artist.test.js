@@ -2,6 +2,7 @@ require('../models')
 
 const request = require("supertest")
 const app = require("../app")
+const Genre = require('../models/Genre')
 
 const URL_ARTISTS = '/artists'
 
@@ -34,6 +35,10 @@ test("Get -> 'URL_ARTISTS', should return status code 200, res.body to be define
   expect(res.statusCode).toBe(200)
   expect(res.body).toBeDefined()
   expect(res.body).toHaveLength(1)
+
+  expect(res.body[0].genres).toBeDefined()
+  expect(res.body[0].genres).toHaveLength(0)
+
 })
 
 test("Get -> 'URL_ARTISTS/:id', should return status code 200, res.body to be defined and res.body.name= artist.name", async () => {
@@ -58,8 +63,32 @@ test("PUT -> 'URL_ARTISTS/:id', should return status code 200, res.body to be de
   expect(res.body.name).toBe('Marylin mason')
 })
 
+test("Post -> 'URL_ARTISTS/:id/genres', should status code 200, res.body to be defined ", async () => {
+
+  const genre = await Genre.create({
+    name: "Pop"
+  })
+
+  // console.log(genre);
+
+  const res = await request(app)
+    .post(`${URL_ARTISTS}/${artistId}/genres`)
+    .send([genre.id])
+
+  // console.log(res.body);
+
+  expect(res.status).toBe(200)
+  expect(res.body).toBeDefined()
+  expect(res.body).toHaveLength(1)
+  expect(res.body[0].id).toBe(genre.id)
+
+
+  await genre.destroy()
+})
+
 
 test("Delete -> 'URL_ARTISTS:id', should return status code 204", async () => {
+
   const res = await request(app)
     .delete(`${URL_ARTISTS}/${artistId}`)
 

@@ -36,6 +36,7 @@ const update = catchError(async (req, res) => {
 });
 
 const setGenres = catchError(async (req, res) => {
+  // /artists/:id/genres
   //buscamos el artista
   const { id } = req.params
   const artist = await Artist.findByPk(id)
